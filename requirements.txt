@@ -1,0 +1,9 @@
+openai-whisper
+mlx-whisper
+streamlit
+ffmpeg-python
+
+# diarization (only needed with --diarize)
+speechbrain
+scikit-learn
+torchaudio
