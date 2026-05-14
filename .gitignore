@@ -219,6 +219,6 @@ __marimo__/
 .streamlit/secrets.toml
 
 # d-and-d-transcriber
-pretrained_models*
-./pretrained_models/   # downloaded ML model weights (auto-fetched at runtime)
-./data/                # runtime data: SQLite DB + uploaded audio files
+pretrained_models/
+data/
+.installed

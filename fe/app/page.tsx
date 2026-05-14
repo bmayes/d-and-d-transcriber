@@ -6,14 +6,14 @@ import { SpeakerCountDialog } from '@/components/speaker-count-dialog'
 import { TranscriptionProgress } from '@/components/transcription-progress'
 import { TranscriptionResult } from '@/components/transcription-result'
 import { api } from '@/lib/api'
-import type { Transcription } from '@/lib/types'
+import type { TranscriptionDetail } from '@/lib/types'
 
 type AppState = 
   | { type: 'idle' }
   | { type: 'awaiting-speaker-count'; file: File }
   | { type: 'uploading'; file: File; speakerCount: number }
-  | { type: 'processing'; transcriptionId: string; filename: string; progress: number }
-  | { type: 'complete'; transcription: Transcription }
+  | { type: 'processing'; transcriptionId: string; filename: string; stage: string }
+  | { type: 'complete'; transcription: TranscriptionDetail; filename: string }
   | { type: 'error'; message: string }
 
 export default function Home() {
@@ -39,9 +39,9 @@ export default function Home() {
       const response = await api.uploadTranscription(file, speakerCount)
       setState({
         type: 'processing',
-        transcriptionId: response.id,
-        filename: response.filename,
-        progress: 0,
+        transcriptionId: response.job_id,
+        filename: file.name,
+        stage: 'uploading',
       })
     } catch (error) {
       setState({
@@ -70,17 +70,17 @@ export default function Home() {
         
         if (transcription.status === 'complete') {
           clearInterval(pollInterval)
-          setState({ type: 'complete', transcription })
-        } else if (transcription.status === 'error') {
+          setState({ type: 'complete', transcription, filename: state.filename })
+        } else if (transcription.status === 'failed') {
           clearInterval(pollInterval)
           setState({
             type: 'error',
-            message: transcription.error_message || 'Transcription failed',
+            message: 'Transcription failed',
           })
         } else {
           setState((prev) => {
             if (prev.type === 'processing') {
-              return { ...prev, progress: transcription.progress }
+              return { ...prev, stage: transcription.stage }
             }
             return prev
           })
@@ -132,8 +132,7 @@ export default function Home() {
       {state.type === 'uploading' && (
         <TranscriptionProgress
           filename={state.file.name}
-          progress={0}
-          status="uploading"
+          stage="uploading"
         />
       )}
 
@@ -141,8 +140,7 @@ export default function Home() {
       {state.type === 'processing' && (
         <TranscriptionProgress
           filename={state.filename}
-          progress={state.progress}
-          status="processing"
+          stage={state.stage}
         />
       )}
 
@@ -150,6 +148,7 @@ export default function Home() {
       {state.type === 'complete' && (
         <TranscriptionResult
           transcription={state.transcription}
+          filename={state.filename}
           onNewTranscription={handleNewTranscription}
         />
       )}

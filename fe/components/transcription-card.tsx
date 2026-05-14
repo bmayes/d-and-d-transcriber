@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { FileAudio, Clock, Users } from 'lucide-react'
-import type { Transcription } from '@/lib/types'
+import { FileAudio, Clock, FileText } from 'lucide-react'
+import type { TranscriptionListResponse } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
 interface TranscriptionCardProps {
-  transcription: Transcription
+  transcription: TranscriptionListResponse
   onSelect?: () => void
 }
 
@@ -22,11 +22,11 @@ function formatDate(dateString: string): string {
 export function TranscriptionCard({ transcription, onSelect }: TranscriptionCardProps) {
   const isComplete = transcription.status === 'complete'
   const isProcessing = transcription.status === 'processing'
-  const isError = transcription.status === 'error'
+  const isError = transcription.status === 'failed'
 
   return (
     <Link
-      href={`/transcription/${transcription.id}`}
+      href={`/transcription/${transcription.job_id}`}
       onClick={onSelect}
       className={cn(
         'block rounded-lg border p-3 transition-colors hover:bg-accent',
@@ -49,10 +49,12 @@ export function TranscriptionCard({ transcription, onSelect }: TranscriptionCard
           </p>
           
           <div className="mt-1 flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              {transcription.speaker_count}
-            </span>
+            {transcription.total_lines && (
+              <span className="flex items-center gap-1">
+                <FileText className="h-3 w-3" />
+                {transcription.total_lines} lines
+              </span>
+            )}
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" />
               {formatDate(transcription.created_at)}
@@ -60,13 +62,8 @@ export function TranscriptionCard({ transcription, onSelect }: TranscriptionCard
           </div>
 
           {isProcessing && (
-            <div className="mt-2">
-              <div className="h-1 w-full rounded-full bg-primary/20">
-                <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${transcription.progress}%` }}
-                />
-              </div>
+            <div className="mt-2 text-xs text-blue-600">
+              Processing...
             </div>
           )}
 

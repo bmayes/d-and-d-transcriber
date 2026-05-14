@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/sheet'
 import { TranscriptionCard } from '@/components/transcription-card'
 import { api } from '@/lib/api'
-import type { Transcription } from '@/lib/types'
+import type { TranscriptionListResponse } from '@/lib/types'
 import { Spinner } from '@/components/ui/spinner'
 
 interface HistorySidebarProps {
@@ -18,7 +18,7 @@ interface HistorySidebarProps {
 }
 
 export function HistorySidebar({ open, onOpenChange }: HistorySidebarProps) {
-  const [transcriptions, setTranscriptions] = useState<Transcription[]>([])
+  const [transcriptions, setTranscriptions] = useState<TranscriptionListResponse[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -30,7 +30,7 @@ export function HistorySidebar({ open, onOpenChange }: HistorySidebarProps) {
       setError(null)
       try {
         const response = await api.listTranscriptions()
-        setTranscriptions(response.transcriptions)
+        setTranscriptions(response)
       } catch (err) {
         setError('Failed to load transcriptions')
         console.error(err)
@@ -75,7 +75,7 @@ export function HistorySidebar({ open, onOpenChange }: HistorySidebarProps) {
 
           {!isLoading && !error && transcriptions.map((transcription) => (
             <TranscriptionCard
-              key={transcription.id}
+              key={transcription.job_id}
               transcription={transcription}
               onSelect={() => onOpenChange(false)}
             />

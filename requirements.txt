@@ -1,9 +1,11 @@
-openai-whisper
+fastapi
+uvicorn[standard]
+python-multipart
 mlx-whisper
-streamlit
-ffmpeg-python
-
-# diarization (only needed with --diarize)
 speechbrain
-scikit-learn
+torch
 torchaudio
+scikit-learn
+numpy
+ffmpeg-python
+SQLAlchemy

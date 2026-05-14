@@ -1,34 +1,31 @@
-export type TranscriptionStatus = 'processing' | 'complete' | 'error'
+export type TranscriptionStatus = 'processing' | 'complete' | 'failed'
+export type TranscriptionStage = 'uploading' | 'transcribing' | 'identifying_speakers' | 'done'
 
-export interface Transcription {
-  id: string
-  status: TranscriptionStatus
-  progress: number
+export interface TranscriptionDetail {
+  job_id: string
   filename: string
-  speaker_count: number
   created_at: string
-  completed_at?: string
+  status: TranscriptionStatus
+  stage: TranscriptionStage
   transcript_preview?: string
   total_lines?: number
-  duration_seconds?: number
-  error_message?: string
 }
 
 export interface TranscriptionListResponse {
-  transcriptions: Transcription[]
+  job_id: string
+  created_at: string
+  filename: string
+  status: TranscriptionStatus
+  total_lines?: number
 }
 
 export interface UploadResponse {
-  id: string
+  job_id: string
   status: TranscriptionStatus
-  filename: string
-  speaker_count: number
-  created_at: string
 }
 
 export interface ApiError {
-  error: string
-  message: string
+  detail: string
 }
 
 export const SUPPORTED_FORMATS = {
